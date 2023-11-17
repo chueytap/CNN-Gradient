@@ -1,0 +1,7 @@
+catboost_info
+/dataset_custom
+/predictions_gradient
+/predictions_resnet
+/predictions_svm
+/predictions_smote
+/models
