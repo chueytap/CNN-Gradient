@@ -45,6 +45,6 @@ The "graphs" folder contains visualizations such as learning curves, accuracy cu
 
 ## Usage
 
+```python
 python main.py
 
-```python
