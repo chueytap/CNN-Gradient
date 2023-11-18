@@ -1,13 +1,14 @@
 
 
+import json
 import matplotlib.pyplot as plt
 
 import os
 import os
 import pickle
 import numpy as np
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, precision_recall_fscore_support
+import seaborn as sns
 
 import matplotlib.pyplot as plt
 
@@ -32,6 +33,8 @@ class_mapping = {
 
 
 def gradient_evaluator(x_test, y_test, x_test_cnn):
+    name="gradient"
+
     """
     Evaluates the performance of a gradient model on a given test set.
 
@@ -60,6 +63,79 @@ def gradient_evaluator(x_test, y_test, x_test_cnn):
     matrix_catboost = confusion_matrix(y_test_mc, y_pred_gradient)
     print("Gradient Model Confusion Matrix: \n", matrix_catboost)
 
+    confusion_matrix_path = os.path.join(
+    "./graphs", name, f"{name}_confusion_matrix.png")
+
+      # Save confusion matrix as an image
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(matrix_catboost, annot=True, fmt="d", cmap="YlGnBu",
+                xticklabels=list(class_mapping.keys()), yticklabels=list(class_mapping.keys()))
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('True Labels')
+    plt.title('Confusion Matrix')
+    plt.tight_layout()
+    confusion_matrix_path = os.path.join(
+        "./graphs", name, f"{name}_confusion_matrix.png")
+    os.makedirs(os.path.dirname(confusion_matrix_path), exist_ok=True)
+    plt.savefig(confusion_matrix_path)
+
+
+    # Save precision, recall, and f1 score graphs for each class
+    precision, recall, f1_score, _ = precision_recall_fscore_support(
+        y_test_mc, y_pred_gradient, average=None, labels=np.unique(y_test_mc)
+    )
+    # Plot bar graphs for accuracy, precision, recall per class
+    metrics_names = ['Precision', 'Recall', 'F1 Score']
+    metrics_values = [precision, recall, f1_score]
+
+    # Calculate averages for precision, recall, and f1-score
+    precision_avg = np.mean(precision)
+    recall_avg = np.mean(recall)
+    f1_score_avg = np.mean(f1_score)
+
+    # Plot bar graphs for accuracy, precision, recall per class
+    metrics_names = ['Precision', 'Recall', 'F1 Score']
+    metrics_values = [precision, recall, f1_score]
+
+    metrics_dict = {
+        'name': name,
+        'accuracy': accuracy_catboost,
+        # Convert NumPy array to list for JSON serialization
+        'precision': precision.tolist(),
+        'recall': recall.tolist(),
+        'f1_score': f1_score.tolist(),
+        'precision_avg': precision_avg,
+        'recall_avg': recall_avg,
+        'f1_score_avg': f1_score_avg
+    }
+
+    # Convert metrics dictionary to JSON
+    metrics_json = json.dumps(metrics_dict, indent=4)
+
+    # Save metrics dictionary as a JSON file
+    metrics_json_path = os.path.join(
+        "./metrics",f"{name}_metrics.json")
+    os.makedirs(os.path.dirname(metrics_json_path), exist_ok=True)
+    with open(metrics_json_path, 'w') as json_file:
+        json.dump(metrics_dict, json_file, indent=4)
+
+    for metric_name, metric_values in zip(metrics_names, metrics_values):
+        plt.figure(figsize=(12, 6))
+        bars = plt.bar(list(class_mapping.keys()), metric_values, color=['maroon','orange','lightpink'])
+        plt.xlabel('Classes')
+        plt.ylabel(metric_name)
+        plt.title(f'{metric_name} per Class')
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
+         # Adding labels to the bars
+        for bar, value in zip(bars, metric_values):
+            plt.text(bar.get_x() + bar.get_width() / 2 - 0.15, bar.get_height() + 0.02, f'{value:.2f}', ha='center', va='bottom')
+
+        metric_path = os.path.join(
+            "./graphs", name, f"{name}_{metric_name.lower()}")
+        os.makedirs(os.path.dirname(metric_path), exist_ok=True)
+        plt.savefig(metric_path)
+
     correct_predictions_folder = "./predictions_gradient/correct_prediction"
     wrong_predictions_folder = "./predictions_gradient/wrong_prediction"
     if not os.path.exists(correct_predictions_folder):
@@ -72,6 +148,8 @@ def gradient_evaluator(x_test, y_test, x_test_cnn):
 
 
 def svm_evaluator(x_test, y_test, x_test_cnn):
+    name="svm"
+
     """
     Evaluates the performance of the SVM model on the test set.
 
@@ -106,6 +184,77 @@ def svm_evaluator(x_test, y_test, x_test_cnn):
     matrix_svm = confusion_matrix(y_test_mc, y_pred_svm)
     print("SVM Model Confusion Matrix: \n", matrix_svm)
 
+    # Save confusion matrix
+    confusion_matrix_path = os.path.join(
+        "./graphs", name, f"{name}_confusion_matrix.png")
+      # Save confusion matrix as an image
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(matrix_svm, annot=True, fmt="d", cmap="BuPu",
+                xticklabels=list(class_mapping.keys()), yticklabels=list(class_mapping.keys()))
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('True Labels')
+    plt.title('Confusion Matrix')
+    plt.tight_layout()
+    confusion_matrix_path = os.path.join(
+        "./graphs", name, f"{name}_confusion_matrix.png")
+    os.makedirs(os.path.dirname(confusion_matrix_path), exist_ok=True)
+    plt.savefig(confusion_matrix_path)
+
+
+      # Calculate precision, recall, and f1-score per class
+    precision, recall, f1_score, _ = precision_recall_fscore_support(
+        y_test_mc, y_pred_svm, average=None, labels=list(class_mapping.values())
+    )
+
+     # Plot bar graphs for accuracy, precision, recall per class
+    metrics_names = ['Precision', 'Recall', 'F1 Score']
+    metrics_values = [precision, recall, f1_score]
+
+     # Calculate averages for precision, recall, and f1-score
+    precision_avg = np.mean(precision)
+    recall_avg = np.mean(recall)
+    f1_score_avg = np.mean(f1_score)
+
+    metrics_dict = {
+        'name': name,
+        'accuracy': accuracy_svm,
+        # Convert NumPy array to list for JSON serialization
+        'precision': precision.tolist(),
+        'recall': recall.tolist(),
+        'f1_score': f1_score.tolist(),
+        'precision_avg': precision_avg,
+        'recall_avg': recall_avg,
+        'f1_score_avg': f1_score_avg
+    }
+
+    # Convert metrics dictionary to JSON
+    metrics_json = json.dumps(metrics_dict, indent=4)
+
+    # Save metrics dictionary as a JSON file
+    metrics_json_path = os.path.join(
+        "./metrics",f"{name}_metrics.json")
+    os.makedirs(os.path.dirname(metrics_json_path), exist_ok=True)
+    with open(metrics_json_path, 'w') as json_file:
+        json.dump(metrics_dict, json_file, indent=4)
+
+    for metric_name, metric_values in zip(metrics_names, metrics_values):
+        plt.figure(figsize=(12, 6))
+        bars =  plt.bar(list(class_mapping.keys()), metric_values, color=['orange','lightgreen','lightpink'])
+        plt.xlabel('Classes')
+        plt.ylabel(metric_name)
+        plt.title(f'{metric_name} per Class')
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
+        # Adding labels to the bars
+        for bar, value in zip(bars, metric_values):
+            plt.text(bar.get_x() + bar.get_width() / 2 - 0.15, bar.get_height() + 0.02, f'{value:.2f}', ha='center', va='bottom')
+
+        metric_path = os.path.join(
+            "./graphs", name, f"{name}_{metric_name.lower()}")
+        os.makedirs(os.path.dirname(metric_path), exist_ok=True)
+        plt.savefig(metric_path)
+
+    
     correct_predictions_folder = "./predictions_svm/correct_prediction"
     wrong_predictions_folder = "./predictions_svm/wrong_prediction"
     if not os.path.exists(correct_predictions_folder):

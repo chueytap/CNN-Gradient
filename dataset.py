@@ -5,6 +5,17 @@ from keras.utils import np_utils
 
 
 def load_dataset(dataset_path, input_shape=(128, 128), split_ratio=0.7):
+    """
+    Loads a dataset from the given path and returns the training and testing data.
+
+    Args:
+        dataset_path (str): The path to the dataset directory.
+        input_shape (tuple, optional): The desired shape of the input images. Defaults to (128, 128).
+        split_ratio (float, optional): The ratio of training data to testing data. Defaults to 0.7.
+
+    Returns:
+        tuple: A tuple containing the training and testing data, each as a tuple of numpy arrays.
+    """
     x_train = []
     y_train = []
     class_folders = os.listdir(dataset_path)
@@ -14,7 +25,8 @@ def load_dataset(dataset_path, input_shape=(128, 128), split_ratio=0.7):
     for class_id, class_folder in enumerate(class_folders):
         class_path = os.path.join(dataset_path, class_folder)
         image_files = os.listdir(class_path)
-        print('Class: {}, number of images: {}'.format(class_folder, len(image_files)))
+        print('Class: {}, number of images: {}'.format(
+            class_folder, len(image_files)))
 
         for image_file in image_files:
             image_path = os.path.join(class_path, image_file)
