@@ -48,4 +48,3 @@ The "graphs" folder contains visualizations such as learning curves, accuracy cu
 python main.py
 
 ```python
-# Example usage of h5Evaluators function
