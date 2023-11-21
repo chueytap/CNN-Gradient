@@ -11,6 +11,7 @@ from sklearn.metrics import precision_recall_fscore_support
 import seaborn as sns
 
 from model import build_resnet_model
+from pickleEvaluators import image_distributor
 
 class_mapping = {
     "afternoon": 0,
@@ -75,7 +76,7 @@ def h5Evaluators(model_path, x_test, y_test, name):
     plt.title('Confusion Matrix')
     plt.tight_layout()
     confusion_matrix_path = os.path.join(
-        "./graphs", name, f"{name}_confusion_matrix.png")
+        "./website/assets/graphs/", name, f"{name}_confusion_matrix.png")
     os.makedirs(os.path.dirname(confusion_matrix_path), exist_ok=True)
     plt.savefig(confusion_matrix_path)
 
@@ -110,73 +111,35 @@ def h5Evaluators(model_path, x_test, y_test, name):
 
     # Save metrics dictionary as a JSON file
     metrics_json_path = os.path.join(
-        "./metrics",f"{name}_metrics.json")
+        "./website/assets/metrics/",f"{name}_metrics.json")
     os.makedirs(os.path.dirname(metrics_json_path), exist_ok=True)
     with open(metrics_json_path, 'w') as json_file:
         json.dump(metrics_dict, json_file, indent=4)
 
     for metric_name, metric_values in zip(metrics_names, metrics_values):
         plt.figure(figsize=(12, 6))
-        bars = plt.bar(list(class_mapping.keys()), metric_values,
-                       color=['gold', 'green', 'lightpink'])
+        bars = plt.bar(list(class_mapping.keys()), metric_values, color=['maroon','orange','lightpink'])
         plt.xlabel('Classes')
         plt.ylabel(metric_name)
         plt.title(f'{metric_name} per Class')
         plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
-
-        # Adding labels to the bars
+         # Adding labels to the bars
         for bar, value in zip(bars, metric_values):
-            plt.text(bar.get_x() + bar.get_width() / 2 - 0.15,
-                     bar.get_height() + 0.02, f'{value:.2f}', ha='center', va='bottom')
+            plt.text(bar.get_x() + bar.get_width() / 2 - 0.15, bar.get_height() + 0.02, f'{value:.2f}', ha='center', va='bottom')
 
         metric_path = os.path.join(
-            "./graphs", name, f"{name}_{metric_name.lower()}")
+            "./website/assets/graphs/", name, f"{name}_{metric_name.lower()}")
         os.makedirs(os.path.dirname(metric_path), exist_ok=True)
         plt.savefig(metric_path)
 
-    # Define the path to the "predictions" folder
-    predictions_path = "./predictions_" + name
+     # Adaptive folder paths based on the provided name
+    correct_predictions_folder = f"./predictions_{name}/correct_prediction"
+    wrong_predictions_folder = f"./predictions_{name}/wrong_prediction"
+    if not os.path.exists(correct_predictions_folder):
+        os.makedirs(correct_predictions_folder)
+    if not os.path.exists(wrong_predictions_folder):
+        os.makedirs(wrong_predictions_folder)
 
-    # Define the names of the subfolders inside "predictions"
-    correct_prediction_path = os.path.join(
-        predictions_path, "correct_prediction")
-    wrong_prediction_path = os.path.join(predictions_path, "wrong_prediction")
-
-    # Create the "predictions" folder and the subfolders inside it
-    os.makedirs(correct_prediction_path, exist_ok=True)
-    os.makedirs(wrong_prediction_path, exist_ok=True)
-
-    # Reverse the class mapping to get a mapping from integer labels to class names
-    reverse_class_mapping = {v: k for k, v in class_mapping.items()}
-
-    # Initialize a counter for the number of incorrect predictions
-    incorrect_count = 0
-
-    # Loop through the test set and save each image to the corresponding folder
-    for i in range(len(x_test)):
-        image = x_test[i]
-        true_label = y_test_mc[i]
-        predicted_label = y_pred_mc[i]
-
-        # Define the image filename
-        image_filename = f"image_{i}.png"
-
-        if true_label == predicted_label:
-            # Save the image to the "correct_prediction" folder
-            image_path = os.path.join(
-                correct_prediction_path, reverse_class_mapping[true_label], image_filename)
-        else:
-            # Increment the counter for the number of incorrect predictions
-            incorrect_count += 1
-            # Save the image to the "wrong_prediction" folder
-            image_path = os.path.join(
-                wrong_prediction_path, reverse_class_mapping[true_label], image_filename)
-
-        # Create the destination directory if it doesn't exist
-        os.makedirs(os.path.dirname(image_path), exist_ok=True)
-
-        # Save the image
-        plt.imsave(image_path, image)
-
-    print("Number of incorrect predictions:", incorrect_count)
+    image_distributor(x_test, y_test_mc, y_pred_mc,
+                      correct_predictions_folder, wrong_predictions_folder)

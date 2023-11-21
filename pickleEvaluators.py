@@ -64,7 +64,7 @@ def gradient_evaluator(x_test, y_test, x_test_cnn):
     print("Gradient Model Confusion Matrix: \n", matrix_catboost)
 
     confusion_matrix_path = os.path.join(
-    "./graphs", name, f"{name}_confusion_matrix.png")
+    "./website/assets/graphs/", name, f"{name}_confusion_matrix.png")
 
       # Save confusion matrix as an image
     plt.figure(figsize=(10, 8))
@@ -75,7 +75,7 @@ def gradient_evaluator(x_test, y_test, x_test_cnn):
     plt.title('Confusion Matrix')
     plt.tight_layout()
     confusion_matrix_path = os.path.join(
-        "./graphs", name, f"{name}_confusion_matrix.png")
+        "./website/assets/graphs/", name, f"{name}_confusion_matrix.png")
     os.makedirs(os.path.dirname(confusion_matrix_path), exist_ok=True)
     plt.savefig(confusion_matrix_path)
 
@@ -114,7 +114,7 @@ def gradient_evaluator(x_test, y_test, x_test_cnn):
 
     # Save metrics dictionary as a JSON file
     metrics_json_path = os.path.join(
-        "./metrics",f"{name}_metrics.json")
+        "./website/assets/metrics/",f"{name}_metrics.json")
     os.makedirs(os.path.dirname(metrics_json_path), exist_ok=True)
     with open(metrics_json_path, 'w') as json_file:
         json.dump(metrics_dict, json_file, indent=4)
@@ -132,7 +132,7 @@ def gradient_evaluator(x_test, y_test, x_test_cnn):
             plt.text(bar.get_x() + bar.get_width() / 2 - 0.15, bar.get_height() + 0.02, f'{value:.2f}', ha='center', va='bottom')
 
         metric_path = os.path.join(
-            "./graphs", name, f"{name}_{metric_name.lower()}")
+            "./website/assets/graphs/", name, f"{name}_{metric_name.lower()}")
         os.makedirs(os.path.dirname(metric_path), exist_ok=True)
         plt.savefig(metric_path)
 
@@ -186,7 +186,7 @@ def svm_evaluator(x_test, y_test, x_test_cnn):
 
     # Save confusion matrix
     confusion_matrix_path = os.path.join(
-        "./graphs", name, f"{name}_confusion_matrix.png")
+        "./website/assets/graphs/", name, f"{name}_confusion_matrix.png")
       # Save confusion matrix as an image
     plt.figure(figsize=(10, 8))
     sns.heatmap(matrix_svm, annot=True, fmt="d", cmap="BuPu",
@@ -196,7 +196,7 @@ def svm_evaluator(x_test, y_test, x_test_cnn):
     plt.title('Confusion Matrix')
     plt.tight_layout()
     confusion_matrix_path = os.path.join(
-        "./graphs", name, f"{name}_confusion_matrix.png")
+        "./website/assets/graphs/", name, f"{name}_confusion_matrix.png")
     os.makedirs(os.path.dirname(confusion_matrix_path), exist_ok=True)
     plt.savefig(confusion_matrix_path)
 
@@ -232,7 +232,7 @@ def svm_evaluator(x_test, y_test, x_test_cnn):
 
     # Save metrics dictionary as a JSON file
     metrics_json_path = os.path.join(
-        "./metrics",f"{name}_metrics.json")
+        "./website/assets/metrics/",f"{name}_metrics.json")
     os.makedirs(os.path.dirname(metrics_json_path), exist_ok=True)
     with open(metrics_json_path, 'w') as json_file:
         json.dump(metrics_dict, json_file, indent=4)
@@ -250,7 +250,7 @@ def svm_evaluator(x_test, y_test, x_test_cnn):
             plt.text(bar.get_x() + bar.get_width() / 2 - 0.15, bar.get_height() + 0.02, f'{value:.2f}', ha='center', va='bottom')
 
         metric_path = os.path.join(
-            "./graphs", name, f"{name}_{metric_name.lower()}")
+            "./website/assets/graphs/", name, f"{name}_{metric_name.lower()}")
         os.makedirs(os.path.dirname(metric_path), exist_ok=True)
         plt.savefig(metric_path)
 
